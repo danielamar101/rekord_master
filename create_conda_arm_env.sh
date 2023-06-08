@@ -1,0 +1,1 @@
+CONDA_SUBDIR=osx-64 conda create -n $@
