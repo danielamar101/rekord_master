@@ -1,0 +1,78 @@
+
+from pynput.mouse import Button, Controller
+import time
+import json
+
+mouse = Controller()
+
+sleepTimeBetweenEvents = 3
+
+print("Hello. Welcome to the calibrator. You will have 3 seconds between each mouse position")
+print("Ready?")
+
+def convertToInt(x):
+    return int(x)
+
+
+def calibrate():
+    print("Hover over the top left of the title bounding box...")
+    time.sleep(sleepTimeBetweenEvents)
+    topLeftTitlePos = tuple(map(convertToInt,mouse.position))
+    print(f"Captured: {topLeftTitlePos}")
+
+    print("Hover over the bottom right of the title bounding box...")
+    time.sleep(sleepTimeBetweenEvents)
+    bottomRightTitlePos = tuple(map(convertToInt,mouse.position))
+    print(f"Captured: {bottomRightTitlePos}")
+
+    print("Hover over the top left of the percent speed bounding box...")
+    time.sleep(sleepTimeBetweenEvents)
+    topLeftSpeedPos = tuple(map(convertToInt,mouse.position))
+    print(f"Captured: {topLeftSpeedPos}")
+
+    print("Hover over the bottom right of the percent speed bounding box...")
+    time.sleep(sleepTimeBetweenEvents)
+    bottomRightSpeedPos = tuple(map(convertToInt,mouse.position))
+    print(f"Captured: {bottomRightSpeedPos}")
+
+    print("Hover over the top left of the elapsed time bounding box...")
+    time.sleep(sleepTimeBetweenEvents)
+    topLeftElapsedTimePos = tuple(map(convertToInt,mouse.position))
+    print(f"Captured: {topLeftElapsedTimePos}")
+
+    print("Hover over the bottom right of the elapsed time bounding box...")
+    time.sleep(sleepTimeBetweenEvents)
+    bottomRightElapsedTimePos = tuple(map(convertToInt,mouse.position))
+    print(f"Captured: {bottomRightElapsedTimePos}")
+
+    deckBoundingBoxes =  {
+        "titlePos" : {'topLeft': topLeftTitlePos, 'bottomRight': bottomRightTitlePos},
+        "percentSpeedPos" : { 'topLeft': topLeftSpeedPos, 'bottomRight': bottomRightSpeedPos},
+        "elapsedTimePos" : {'topLeft': topLeftElapsedTimePos, 'bottomRight': bottomRightElapsedTimePos}
+    }
+
+    return deckBoundingBoxes
+
+
+def main():
+        print("First, we will calibrate the left deck...")
+
+        leftDeck = calibrate()
+        print(leftDeck)
+
+        print("Next, we will calibrate the right deck...")
+
+        rightDeck = calibrate()
+
+        print(leftDeck)
+        print(rightDeck)
+
+        return json.dumps({
+             'left_deck': leftDeck,
+             'right_deck': rightDeck
+        })
+
+
+if __name__ == "__name__":
+     
+     main()
