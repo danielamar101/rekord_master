@@ -2,14 +2,15 @@ from PIL import Image
 import subprocess
 import os
 import pytesseract
+
+from calibrate_full import main as calibrate
 import time
 import json
-import cv2
 
 
 
 def loadAndFireCoordinates():
-    file_in = open('/Users/danielamar/Desktop/Code/music_master/rekord2song/src/ocr/DECK_MOUSE_POS.json', 'r')
+    file_in = open('/Users/danielamar/Desktop/Code/music_master/rekord2song/src/ocr/DECK_MOUSE_POS1.json', 'r')
     decks = json.load(file_in)
 
     rawCoordinates = []
@@ -58,29 +59,18 @@ def getLeftDeck():
     # Elapsed time
     subprocess.run(['screencapture',coordinates[2],'./song1ElapsedTime.png'], capture_output=True, text=True, cwd=os.getcwd())
     imagePath = os.path.join(os.getcwd(),'song1ElapsedTime.png')
-    
-    # Some tesseract magic here to help us with gray text for elapsed Time
-    originalImage = cv2.imread(imagePath)
-    gray_image = cv2.cvtColor(originalImage, cv2.COLOR_BGR2GRAY)
-    thresh_img = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    deck1ElapsedTime = pytesseract.image_to_string(thresh_img,config='--psm 7 --oem 3').strip()
+    deck1ElapsedTime = pytesseract.image_to_string(Image.open(imagePath)).strip()
     # print(deck1ElapsedTime)
     os.remove(imagePath)
 
     # Original BPM
     subprocess.run(['screencapture',coordinates[3],'./song1BPM.png'], capture_output=True, text=True, cwd=os.getcwd())
     imagePath = os.path.join(os.getcwd(),'song1BPM.png')
-
-    # Some tesseract magic here to help us with gray text for original BPM
-    originalImage = cv2.imread(imagePath)
-    gray_image = cv2.cvtColor(originalImage, cv2.COLOR_BGR2GRAY)
-    thresh_img = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    deck1OriginalBPM = pytesseract.image_to_string(thresh_img,config='--psm 7 --oem 3').strip()
-
+    deck1OriginalBPM = pytesseract.image_to_string(Image.open(imagePath)).strip()
     # print(deck1ElapsedTime)
-    os.remove(imagePath)
+    # os.remove(imagePath)
 
-    return [deck1Name,deck1PercentSpeed, deck1ElapsedTime, deck1OriginalBPM]
+    return [deck1Name,deck1ElapsedTime,deck1PercentSpeed, deck1OriginalBPM]
 
 def getRightDeck():
     coordinates = loadAndFireCoordinates()
@@ -100,27 +90,18 @@ def getRightDeck():
 
     subprocess.run(['screencapture',coordinates[6],'./song2ElapsedTime.png'], capture_output=True, text=True, cwd=os.getcwd())
     imagePath = os.path.join(os.getcwd(),'song2ElapsedTime.png')
-    
-    # Some tesseract magic here to help us with gray text for elapsed Time
-    originalImage = cv2.imread(imagePath)
-    gray_image = cv2.cvtColor(originalImage, cv2.COLOR_BGR2GRAY)
-    thresh_img = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    deck2ElapsedTime = pytesseract.image_to_string(thresh_img,config='--psm 7 --oem 3').strip()
+    deck2ElapsedTime = pytesseract.image_to_string(Image.open(imagePath)).strip()
+    # print(deck2ElapsedTime)
     os.remove(imagePath)
 
     # Original BPM
     subprocess.run(['screencapture',coordinates[7],'./song2BPM.png'], capture_output=True, text=True, cwd=os.getcwd())
     imagePath = os.path.join(os.getcwd(),'song2BPM.png')
-        # Some tesseract magic here to help us with gray text for original BPM
-    originalImage = cv2.imread(imagePath)
-    gray_image = cv2.cvtColor(originalImage, cv2.COLOR_BGR2GRAY)
-    thresh_img = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    deck2OriginalBPM = pytesseract.image_to_string(thresh_img,config='--psm 7 --oem 3').strip()
-
+    deck2OriginalBPM = pytesseract.image_to_string(Image.open(imagePath)).strip()
     # print(deck1ElapsedTime)
-    os.remove(imagePath)
+    # os.remove(imagePath)
 
-    return [deck2Name,deck2PercentSpeed, deck2ElapsedTime, deck2OriginalBPM]
+    return [deck2Name,deck2ElapsedTime,deck2PercentSpeed, deck2OriginalBPM]
 
 if __name__ == "__main__":
 
@@ -128,9 +109,8 @@ if __name__ == "__main__":
         try:   
             print(os.environ['CALIBRATE'])
             if (os.environ['CALIBRATE'] == 'true'):
-                from calibrate_full import main as calibrate
                 new_mouse_positions = calibrate()
-                file_out = open('./DECK_MOUSE_POS.json', 'w')
+                file_out = open('./DECK_MOUSE_POS1.json', 'w')
                 file_out.write(new_mouse_positions)
                 file_out.close()
             else:
@@ -145,8 +125,6 @@ if __name__ == "__main__":
     time.sleep(3)
     print(getLeftDeck())
     print(getRightDeck())
-else: 
-    from ocr.calibrate_full import main as calibrate
 
 
 

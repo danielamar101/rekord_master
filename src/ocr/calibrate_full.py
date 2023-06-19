@@ -49,10 +49,25 @@ def calibrate():
     print(f"Captured: {bottomRightElapsedTimePos}")
     os.system('say "Good."')
 
+    print("Hover over the top left of the original BPM bounding box...")
+    time.sleep(sleepTimeBetweenEvents)
+    topLeftBPMPos = tuple(map(convertToInt,mouse.position))
+    print(f"Captured: {topLeftElapsedTimePos}")
+    os.system('say "Good."')
+
+    print("Hover over the bottom right of the original BPM bounding box...")
+    time.sleep(sleepTimeBetweenEvents)
+    bottomRightBPMPos = tuple(map(convertToInt,mouse.position))
+    print(f"Captured: {bottomRightElapsedTimePos}")
+    os.system('say "Good."')
+
+
+
     deckBoundingBoxes =  {
         "titlePos" : {'topLeft': topLeftTitlePos, 'bottomRight': bottomRightTitlePos},
         "percentSpeedPos" : { 'topLeft': topLeftSpeedPos, 'bottomRight': bottomRightSpeedPos},
-        "elapsedTimePos" : {'topLeft': topLeftElapsedTimePos, 'bottomRight': bottomRightElapsedTimePos}
+        "elapsedTimePos" : {'topLeft': topLeftElapsedTimePos, 'bottomRight': bottomRightElapsedTimePos},
+        "originalBPM" : {'topLeft': topLeftBPMPos, 'bottomRight': bottomRightBPMPos}
     }
 
     return deckBoundingBoxes
@@ -80,6 +95,9 @@ def main():
         })
 
 
-if __name__ == "__name__":
+if __name__ == "__main__":
      
-     main()
+    new_mouse_positions = main()
+    file_out = open('./DECK_MOUSE_POS.json', 'w')
+    file_out.write(new_mouse_positions)
+    file_out.close()

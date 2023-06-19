@@ -33,31 +33,29 @@ def sigterm_handler(signal, frame):
 signal.signal(signal.SIGINT, sigterm_handler)
 
 
-while True:
-    subprocess.run(['screencapture','-R57,283,600,21','./song1Name.png'], capture_output=True, text=True, cwd=os.getcwd())
-    imagePath = os.path.join(os.getcwd(),'song1Name.png')
-    deck1Name = pytesseract.image_to_string(Image.open(imagePath)).strip()
+# while True:
+    # subprocess.run(['screencapture','-R57,283,600,21','./song1Name.png'], capture_output=True, text=True, cwd=os.getcwd())
+    # imagePath = os.path.join(os.getcwd(),'song1Name.png')
+    # deck1Name = pytesseract.image_to_string(Image.open(imagePath)).strip()
 
-    showBoxAroundWords(imagePath)
-    os.remove(imagePath)
+imagePath='/Users/danielamar/Desktop/Code/music_master/rekord2song/src/ocr/song2BPM.png'
+showBoxAroundWords(imagePath)
 
-    #   # Percent speed
-    # subprocess.run(['screencapture','-R689,443,34,12','./song1PercentSpeed.png'], capture_output=True, text=True, cwd=os.getcwd())
-    # imagePath = os.path.join(os.getcwd(),'song1PercentSpeed.png')
-    # deck1PercentSpeed = pytesseract.image_to_string(Image.open(imagePath)).strip()
-    # # print(deck1PercentSpeed)
 
-    # showBoxAroundWords(imagePath)
-    # os.remove(imagePath)
+print("Text is:")
+print(pytesseract.image_to_string(Image.open(imagePath)).strip())
 
-    # # Elapsed time
-    # subprocess.run(['screencapture','-R630,302,63,18','./song1ElapsedTime.png'], capture_output=True, text=True, cwd=os.getcwd())
-    # imagePath = os.path.join(os.getcwd(),'song1ElapsedTime.png')
-    # deck1ElapsedTime = pytesseract.image_to_string(Image.open(imagePath)).strip()
-    # # print(deck1ElapsedTime)
+originalImage = cv2.imread(imagePath)
+grayImage = cv2.cvtColor(originalImage, cv2.COLOR_BGR2GRAY)
+thresh_img = cv2.threshold(grayImage, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+print(pytesseract.image_to_string(thresh_img,config='--psm 7 --oem 3'))
+# Converting grey image to binary image by Thresholding
 
-    # showBoxAroundWords(imagePath)
-    time.sleep(10)
-    os.remove(imagePath)
+
+cv2.imwrite('/Users/danielamar/Desktop/Code/music_master/rekord2song/src/ocr/song2BPMModded.png',thresh_img)
+# showBoxAroundWords(imagePath)
+
+time.sleep(10)
+#os.remove(imagePath)
 
 

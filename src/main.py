@@ -2,6 +2,7 @@ import subprocess
 import os
 import time
 from pynput import keyboard
+import signal
 
 import pytesseract
 from PIL import Image
@@ -12,6 +13,19 @@ mainProcess = None
 bufferProcess = None
 
 debug = True
+
+def kill_pid(process):        
+    """ Check For the existence of a unix pid. """
+    print(process)
+    try:
+        if(hasattr(process,'terminate')):
+            process.terminate()
+            return True
+    except OSError:
+        return False
+    
+
+    return False
 
 def main(): 
     global currentDeckNumber
@@ -25,10 +39,11 @@ def main():
         #1. Grab Song info, speed of song, and elapsed time
         deckList = getLeftDeck() if currentDeckNumber == 1 else getRightDeck()
 
+        print(deckList)
         checkListener()
 
-        # Song Name, Elapsed time, Percent speed
-        deckInUse = [deckList[0], elapsedStringTimeToIntegerEpoch(deckList[1]), relativeStringPercentToDecimal(deckList[2])] 
+        # Song Name, Percent speed, Elapsed Time, starting bpm
+        deckInUse = [deckList[0], elapsedStringTimeToIntegerEpoch(deckList[2]), relativeStringPercentToDecimal(deckList[1], deckList[3])] 
       
         print("")
         print(f'SELECTED DECK #{currentDeckNumber}. CONTAINS: {deckInUse}')
@@ -37,7 +52,7 @@ def main():
         #2 Find song in file directory  
         videoList = os.listdir("./videos")
         filteredVideoList = [video[0:len(video)-4] for video in videoList if video[(len(video)-3):] == 'mp4']
-        print(f'List of videos in videos dir: {filteredVideoList}') 
+        #print(f'List of videos in videos dir: {filteredVideoList}') 
 
         # Goal of the following for loop is to find a song path
         selectedVideoPath = ''
@@ -59,27 +74,36 @@ def main():
         print(f'Deck video path is: {selectedVideoPath}') if debug is True else None
         
            
-        print(f'Starting song at time {deckInUse[1]} with speed {deckInUse[2]}')
+        #print(f'Starting song at time {deckInUse[1]} with speed {deckInUse[2]}')
         #3 use vlc cli to play song
 
         #Switching between main process and buffer process to ensure there is always overlap while one is booting up
         if(mainProcess is None):
-            mainProcess.kill() if hasattr(mainProcess, 'kill') else print("Not killing anything..")
+            print("in main proc")
+            # mainProcess.kill() if hasattr(mainProcess, 'kill') else print("Not killing anything..")
             print("Starting screen...")
-            mainProcess = subprocess.Popen(['/Applications/VLC.app/Contents/MacOS/VLC',selectedVideoPath, f'--start-time={deckInUse[1]}', f'--rate={deckInUse[2]}' ],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-            #mainProcess = subprocess.Popen(['/Applications/VLC.app/Contents/MacOS/VLC',selectedVideoPath, '--fullscreen', f'--start-time={deckInUse[1]}', f'--rate={deckInUse[2]}' ],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            kill_pid(mainProcess)
+            mainProcess = subprocess.Popen(['mpv',selectedVideoPath, f'--start={deckInUse[1]}' , f'--speed={deckInUse[2]}', '--screen=1', '--no-audio' ])
           
-            time.sleep(3)
+            time.sleep(2)
             print("Killing screen...")
-            bufferProcess.kill() if hasattr(bufferProcess, 'kill') else print("Not killing anything..")
+            print(kill_pid(bufferProcess))
+            time.sleep(1)
+            bufferProcess = None
+            # os.kill(bufferProcess.pid, signal.SIGTERM) if hasattr(bufferProcess, 'pid') else print("Not killing anything..")
         else:   
-            bufferProcess.kill() if hasattr(bufferProcess, 'kill') else print("Not killing anything..") 
+            print("in buffer proc")
+            # bufferProcess.kill() if hasattr(bufferProcess, 'kill') else print("Not killing anything..") 
             print("Starting screen...")
-            bufferProcess = subprocess.Popen(['/Applications/VLC.app/Contents/MacOS/VLC',selectedVideoPath, f'--start-time={deckInUse[1]}', f'--rate={deckInUse[2]}' ],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            kill_pid(bufferProcess)
+            bufferProcess = subprocess.Popen(['mpv',selectedVideoPath, f'--start={deckInUse[1]}', f'--speed={deckInUse[2]}', '--screen=1', '--no-audio' ])
             
-            time.sleep(3)
+            time.sleep(2)
             print("Killing screen...")
-            mainProcess.kill() if hasattr(mainProcess, 'kill') else print("Not killing anything..")
+            print(kill_pid(mainProcess))
+            time.sleep(1)
+            mainProcess = None
+            #os.kill(mainProcess.pid, signal.SIGTERM) if hasattr(mainProcess, 'pid') else print("Not killing anything..")
         
 
     except Exception as e:
@@ -90,22 +114,30 @@ def main():
 
 
 # Given a relative percent speed as a string return the absolute speed as a double
-def relativeStringPercentToDecimal(percentSpeed):
+def relativeStringPercentToDecimal(percentSpeed, originalBPM):
 
     sign = percentSpeed[0]
-    isNegative = True if sign == '-' else False
 
-    # remove the percent and sign if it exists
-    justTheNumber = percentSpeed[1:len(percentSpeed)-1] if isNegative else percentSpeed[0:len(percentSpeed)-1]
+    isBeatSynced = False if percentSpeed[len(percentSpeed)-1] == '%' else True
 
-    #convert percent to decimal number
-    relativePercentage = float(justTheNumber) / 100.0
+    if not isBeatSynced:
 
-    # Return the relative percent speed from 1.0
-    if isNegative:
-        return "{:.2f}".format(1 - relativePercentage)
+        isNegative = True if sign == '-' else False
+
+        # remove the percent and sign if it exists
+        justTheNumber = percentSpeed[1:len(percentSpeed)-1] if isNegative else percentSpeed[0:len(percentSpeed)-1]
+
+        #convert percent to decimal number
+        relativePercentage = float(justTheNumber) / 100.0
+
+        # Return the relative percent speed from 1.0
+        if isNegative:
+            return "{:.2f}".format(1 - relativePercentage)
+        else:
+            return "{:.2f}".format(1 + relativePercentage)
     else:
-        return "{:.2f}".format(1 + relativePercentage)
+
+        return "{:.2f}".format(float(percentSpeed) / float(originalBPM))
 
 
 # Given a string with an elapsed time in MM:SS format, convert to an integer
@@ -169,19 +201,3 @@ while True:
 
 
 
-
-
-
-
-
-# /Applications/VLC.app/Contents/MacOS/VLC
-# --qt-fullscreen-screennumber=<integer> 
-#                                  Define which screen fullscreen goes
-#           Screennumber of fullscreen, instead of same screen where interface
-#           is.
-# main()
-
-
-
-
-# The event listener will be running in this block
