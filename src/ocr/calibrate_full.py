@@ -2,13 +2,11 @@
 from pynput.mouse import Button, Controller
 import time
 import json
+import os
 
 mouse = Controller()
 
 sleepTimeBetweenEvents = 3
-
-print("Hello. Welcome to the calibrator. You will have 3 seconds between each mouse position")
-print("Ready?")
 
 def convertToInt(x):
     return int(x)
@@ -19,31 +17,37 @@ def calibrate():
     time.sleep(sleepTimeBetweenEvents)
     topLeftTitlePos = tuple(map(convertToInt,mouse.position))
     print(f"Captured: {topLeftTitlePos}")
+    os.system('say "Good."')
 
     print("Hover over the bottom right of the title bounding box...")
     time.sleep(sleepTimeBetweenEvents)
     bottomRightTitlePos = tuple(map(convertToInt,mouse.position))
     print(f"Captured: {bottomRightTitlePos}")
+    os.system('say "Good."')
 
     print("Hover over the top left of the percent speed bounding box...")
     time.sleep(sleepTimeBetweenEvents)
     topLeftSpeedPos = tuple(map(convertToInt,mouse.position))
     print(f"Captured: {topLeftSpeedPos}")
+    os.system('say "Good."')
 
     print("Hover over the bottom right of the percent speed bounding box...")
     time.sleep(sleepTimeBetweenEvents)
     bottomRightSpeedPos = tuple(map(convertToInt,mouse.position))
     print(f"Captured: {bottomRightSpeedPos}")
+    os.system('say "Good."')
 
     print("Hover over the top left of the elapsed time bounding box...")
     time.sleep(sleepTimeBetweenEvents)
     topLeftElapsedTimePos = tuple(map(convertToInt,mouse.position))
     print(f"Captured: {topLeftElapsedTimePos}")
+    os.system('say "Good."')
 
     print("Hover over the bottom right of the elapsed time bounding box...")
     time.sleep(sleepTimeBetweenEvents)
     bottomRightElapsedTimePos = tuple(map(convertToInt,mouse.position))
     print(f"Captured: {bottomRightElapsedTimePos}")
+    os.system('say "Good."')
 
     deckBoundingBoxes =  {
         "titlePos" : {'topLeft': topLeftTitlePos, 'bottomRight': bottomRightTitlePos},
@@ -55,6 +59,9 @@ def calibrate():
 
 
 def main():
+        print("Hello. Welcome to the calibrator. You will have 3 seconds between each mouse position")
+        print("Ready?")
+
         print("First, we will calibrate the left deck...")
 
         leftDeck = calibrate()

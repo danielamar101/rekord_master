@@ -64,18 +64,22 @@ def main():
 
         #Switching between main process and buffer process to ensure there is always overlap while one is booting up
         if(mainProcess is None):
-            mainProcess.kill() if hasattr(mainProcess, 'kill') else None
-            mainProcess = subprocess.Popen(['/Applications/VLC.app/Contents/MacOS/VLC',selectedVideoPath, f'--start-time={deckInUse[1] + 1 * float(deckInUse[1])}', f'--rate={deckInUse[2]}' ],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            mainProcess.kill() if hasattr(mainProcess, 'kill') else print("Not killing anything..")
+            print("Starting screen...")
+            mainProcess = subprocess.Popen(['/Applications/VLC.app/Contents/MacOS/VLC',selectedVideoPath, f'--start-time={deckInUse[1]}', f'--rate={deckInUse[2]}' ],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
             #mainProcess = subprocess.Popen(['/Applications/VLC.app/Contents/MacOS/VLC',selectedVideoPath, '--fullscreen', f'--start-time={deckInUse[1]}', f'--rate={deckInUse[2]}' ],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
           
             time.sleep(3)
-            bufferProcess.kill() if hasattr(bufferProcess, 'kill') else None
+            print("Killing screen...")
+            bufferProcess.kill() if hasattr(bufferProcess, 'kill') else print("Not killing anything..")
         else:   
-            bufferProcess.kill() if hasattr(bufferProcess, 'kill') else None 
-            bufferProcess = subprocess.Popen(['/Applications/VLC.app/Contents/MacOS/VLC',selectedVideoPath, f'--start-time={deckInUse[1] + 1 * float(deckInUse[1])}', f'--rate={deckInUse[2]}' ],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+            bufferProcess.kill() if hasattr(bufferProcess, 'kill') else print("Not killing anything..") 
+            print("Starting screen...")
+            bufferProcess = subprocess.Popen(['/Applications/VLC.app/Contents/MacOS/VLC',selectedVideoPath, f'--start-time={deckInUse[1]}', f'--rate={deckInUse[2]}' ],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
             
             time.sleep(3)
-            mainProcess.kill() if hasattr(mainProcess, 'kill') else None
+            print("Killing screen...")
+            mainProcess.kill() if hasattr(mainProcess, 'kill') else print("Not killing anything..")
         
 
     except Exception as e:
