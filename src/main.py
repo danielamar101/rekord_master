@@ -162,8 +162,8 @@ def on_press(key):
         elif hasattr(key,'char') and key.char == 'a':
             print('Pressed a') 
             currentDeckNumber = 1
-        elif hasattr(key,'char') and key.char == 's':
-            print('Pressed s') 
+        elif hasattr(key,'char') and key.char == 'd':
+            print('Pressed d') 
             currentDeckNumber = 2
         else:
             pass;

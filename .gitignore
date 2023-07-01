@@ -1,2 +1,6 @@
 bin/
 **/*/DECK_MOUSE_POS.json
+**/*/videos
+**/*/audio
+
+*.pyc
