@@ -6,10 +6,14 @@ import time
 import json
 import cv2
 
+pos_path = ''
+
 
 
 def loadAndFireCoordinates():
-    file_in = open('/Users/danielamar/Desktop/Code/music_master/rekord2song/src/ocr/DECK_MOUSE_POS.json', 'r')
+    global pos_path
+    
+    file_in = open(pos_path, 'r')
     decks = json.load(file_in)
 
     rawCoordinates = []
@@ -123,6 +127,7 @@ def getRightDeck():
     return [deck2Name,deck2PercentSpeed, deck2ElapsedTime, deck2OriginalBPM]
 
 if __name__ == "__main__":
+    pos_path = os.path.join('./DECK_MOUSE_POS.json')
 
     def calibrateScreenCoords():
         try:   
@@ -130,9 +135,11 @@ if __name__ == "__main__":
             if (os.environ['CALIBRATE'] == 'true'):
                 from calibrate_full import main as calibrate
                 new_mouse_positions = calibrate()
-                file_out = open('./DECK_MOUSE_POS.json', 'w')
-                file_out.write(new_mouse_positions)
-                file_out.close()
+                shouldISave = input("Should we save these results? Y/n:")
+                if shouldISave == 'Y':
+                    file_out = open('./DECK_MOUSE_POS.json', 'w')
+                    file_out.write(new_mouse_positions)
+                    file_out.close()
             else:
                 print('Correct env var was not set. Not calibrating.')
             
@@ -147,6 +154,7 @@ if __name__ == "__main__":
     print(getRightDeck())
 else: 
     from ocr.calibrate_full import main as calibrate
+    pos_path = os.path.join(os.getcwd(),'ocr','DECK_MOUSE_POS.json')
 
 
 

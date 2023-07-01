@@ -3,10 +3,12 @@ import os
 import time
 from pynput import keyboard
 import signal
+import traceback
 
 import pytesseract
 from PIL import Image
 from ocr.getLeftAndRightDeckInfo import getLeftDeck, getRightDeck
+from fuzzywuzzy import fuzz
 
 currentDeckNumber = 1
 mainProcess = None
@@ -59,16 +61,19 @@ def main():
 
         for i in range(len(filteredVideoList)):
             lengthOfSongTitle = len(deckInUse[0])
-            if(len(filteredVideoList[i]) < lengthOfSongTitle):
-                pass;
-            elif(deckInUse[0] == filteredVideoList[i][0:lengthOfSongTitle]):
+            currentSong = filteredVideoList[i][0:lengthOfSongTitle]
+            fuzzyStringComparisonRatio = fuzz.ratio(deckInUse[0].lower(), currentSong.lower())
+            # print(f'FUZZY RATIO IS: {fuzz.ratio(deckInUse[0].lower(), currentSong.lower())} FOR SONG: {currentSong}')
+
+            # If the song titles match exactly or have a small levenshtein distance ratio between eachother, we found a match.
+            # Note: Levenshtein distance is used for fuzzy string comparison due to expected OCR inconsistencies
+            if(deckInUse[0] == currentSong or fuzzyStringComparisonRatio > 80):
                 selectedVideoPath = os.path.join(os.getcwd(),'videos',filteredVideoList[i]) + '.mp4'
             else:
                 pass;
         
         if(selectedVideoPath == ''):
             print("ERROR: NO VISUALIZATION VIDEO DETECTED TO ACCOMPANY TRACK. DOING NOTHING INSTEAD...")
-
             return;
 
         print(f'Deck video path is: {selectedVideoPath}') if debug is True else None
@@ -107,7 +112,8 @@ def main():
         
 
     except Exception as e:
-        print(f"There was an error: ${e}")
+        print(f"There was an error: {e}")
+        traceback.print_exc()
 
 
 #### Helpers 

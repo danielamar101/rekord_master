@@ -76,6 +76,7 @@ def calibrate():
 def main():
         print("Hello. Welcome to the calibrator. You will have 3 seconds between each mouse position")
         print("Ready?")
+        os.system('say "Beginning Calibration."')
 
         print("First, we will calibrate the left deck...")
 
