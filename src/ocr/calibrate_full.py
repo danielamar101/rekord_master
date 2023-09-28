@@ -99,6 +99,8 @@ def main():
 if __name__ == "__main__":
      
     new_mouse_positions = main()
-    file_out = open('./DECK_MOUSE_POS.json', 'w')
-    file_out.write(new_mouse_positions)
-    file_out.close()
+    shouldISave = input("Should we save these results? Y/n:")
+    if shouldISave == 'Y':
+        file_out = open('./DECK_MOUSE_POS.json', 'w')
+        file_out.write(new_mouse_positions)
+        file_out.close()

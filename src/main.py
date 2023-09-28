@@ -88,7 +88,7 @@ def main():
             # mainProcess.kill() if hasattr(mainProcess, 'kill') else print("Not killing anything..")
             print("Starting screen...")
             kill_pid(mainProcess)
-            mainProcess = subprocess.Popen(['mpv',selectedVideoPath, f'--start={deckInUse[1]}' , f'--speed={deckInUse[2]}', '--screen=1', '--no-audio' ])
+            mainProcess = subprocess.Popen(['mpv',selectedVideoPath, f'--start={deckInUse[1]}' , f'--speed={deckInUse[2]}', '--geometry=720x408+0+1292','--screen=1', '--no-audio' ])
           
             time.sleep(2)
             print("Killing screen...")
@@ -101,7 +101,7 @@ def main():
             # bufferProcess.kill() if hasattr(bufferProcess, 'kill') else print("Not killing anything..") 
             print("Starting screen...")
             kill_pid(bufferProcess)
-            bufferProcess = subprocess.Popen(['mpv',selectedVideoPath, f'--start={deckInUse[1]}', f'--speed={deckInUse[2]}', '--screen=1', '--no-audio' ])
+            bufferProcess = subprocess.Popen(['mpv',selectedVideoPath, f'--start={deckInUse[1]}', f'--speed={deckInUse[2]}', '--screen=1', '--geometry=720x408+0+1292', '--no-audio' ])
             
             time.sleep(2)
             print("Killing screen...")
@@ -114,6 +114,7 @@ def main():
     except Exception as e:
         print(f"There was an error: {e}")
         traceback.print_exc()
+
 
 
 #### Helpers 
