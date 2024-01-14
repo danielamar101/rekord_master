@@ -1,0 +1,16 @@
+name: rekord-master
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+  # - numpy==1.24.3
+  # - opencv-python==4.7.0.72
+  # - packaging==23.1
+  # - Pillow==9.5.0
+  # - pynput==1.7.6
+  # - pyobjc-core==9.1.1
+  # - pyobjc-framework-ApplicationServices==9.1.1
+  # - pyobjc-framework-Cocoa==9.1.1
+  # - pyobjc-framework-Quartz==9.1.1
+  # - pytesseract==0.3.10
+  # - six==1.16.0
