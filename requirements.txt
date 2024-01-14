@@ -9,3 +9,4 @@ pyobjc-framework-Cocoa==9.1.1
 pyobjc-framework-Quartz==9.1.1
 pytesseract==0.3.10
 six==1.16.0
+fuzzywuzzy

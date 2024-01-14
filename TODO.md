@@ -1,4 +1,12 @@
 
+
+
+1/13/24
+
+- Add multithreading for exit listener. Experiment with speeding up video playback through multithreading
+
+
+
 MUST:
 
 - Fix process not being killed (DONE)
@@ -17,9 +25,6 @@ MUST:
     S: Check for display resolution changes
 
 - Look into faster and more robust OCR method
-
-
-
 
 STRETCH:
 
