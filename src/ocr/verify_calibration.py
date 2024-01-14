@@ -9,18 +9,12 @@ def main():
 
     time.sleep(10)
 
-    expectedTest1 = 
+    # expectedTest1 = 
     actualTest1 = getLeftDeck()
 
 
-
-
-
-
-
-
 if __name__ == '__main__':
-    from getLeftAndRightDeckInfo import getLeftDeck, getRightDeck
+    from rekord2song.src.ocr.get_both_deck_info import getLeftDeck, getRightDeck
     main()
 else:
-    from ocr.getLeftAndRightDeckInfo import getLeftDeck, getRightDeck
+    from rekord2song.src.ocr.get_both_deck_info import getLeftDeck, getRightDeck
