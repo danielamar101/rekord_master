@@ -21,7 +21,7 @@ Since rekordbox does not have an api, we rely on OCR and CV to grab the necessar
 
 The script will start asking you to drag select the coordinates in order. Here is a reference chart:
 
-<add it here lol>
+[!rekordboxpositions](https://github.com/danielamar101/rekord_master/blob/main/rekordboxpositions.jpg)
 
 Add videos to the directory `src/videos`. Ensure the video names match your song names in rekordbox. After that you should be good to go.
 
