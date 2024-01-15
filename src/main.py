@@ -10,7 +10,7 @@ import traceback
 from helpers.data_conversions import elapsedStringTimeToIntegerEpoch, relativeStringPercentToDecimal
 from app.process_handlers import manage_video_processes
 from app.listeners import checkListener
-from rekord2song.src.ocr.get_both_deck_info import getLeftDeck, getRightDeck
+from ocr.get_both_deck_info import getLeftDeck, getRightDeck
 from app.globals import current_deck_number, main_process, buffer_process, debug
 
 
