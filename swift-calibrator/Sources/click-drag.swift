@@ -24,32 +24,31 @@ class DragAreaView: NSView {
 
     override func mouseDragged(with event: NSEvent) {
         guard let start = startPoint else { return }
+        let actual_start = window?.convertPoint(toScreen: start) ?? NSPoint.zero
         let windowPoint = convert(event.locationInWindow, from: nil)
         
         // Convert the coordinates to the absolute screen coordinates
-        var currentPoint = window?.convertPoint(toScreen: windowPoint) ?? NSPoint.zero
+        let currentPoint = window?.convertPoint(toScreen: windowPoint) ?? NSPoint.zero
         
-        
+        var screenHeight = CGFloat(0)
         // To make the coordinates match up with ocr screenreader
-//        if let screen = window?.screen {
-//            let screenHeight = screen.frame.size.height
-//            currentPoint.y = screenHeight - currentPoint.y
-//        }
-        
-        
+        if let screen = window?.screen {
+            screenHeight = screen.frame.size.height
 
+        }
+        
         dragRect = NSRect(x: min(start.x, windowPoint.x),
                           y: min(start.y, windowPoint.y),
                           width: abs(windowPoint.x - start.x),
                           height: abs(windowPoint.y - start.y))
         
-        self.actualRect = NSRect(x: start.x,
-                          y: start.y,
-                          width: abs(currentPoint.x - start.x),
-                          height: abs(currentPoint.y - start.y))
+        self.actualRect = NSRect(x: actual_start.x,
+                          y: screenHeight - actual_start.y,
+                          width: abs(currentPoint.x - actual_start.x),
+                          height: abs(currentPoint.y - actual_start.y))
         
-        //print("Relative Rect:" + NSStringFromRect(dragRect ?? NSRect(x: 0, y: 0, width: 0, height: 0)))
-    //print("Absolute Rect:" + NSStringFromRect(self.actualRect ?? NSRect(x: 0, y: 0, width: 0, height: 0)))
+//        print("Relative Rect:" + NSStringFromRect(dragRect ?? NSRect(x: 0, y: 0, width: 0, height: 0)))
+//        print("Absolute Rect:" + NSStringFromRect(self.actualRect ?? NSRect(x: 0, y: 0, width: 0, height: 0)))
         needsDisplay = true
     }
 
