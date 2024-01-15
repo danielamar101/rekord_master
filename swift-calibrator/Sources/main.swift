@@ -35,6 +35,9 @@ class RectangleView: NSView {
 class MainScript: NSObject, DragAreaDelegate, NSWindowDelegate {
     var cliFlags: [String] = []
     
+    var savedRectCoords: [Any] = []
+    
+
     init(flags: [String]) {
         self.cliFlags = flags
         
@@ -45,22 +48,28 @@ class MainScript: NSObject, DragAreaDelegate, NSWindowDelegate {
         
         
         // Calculate topLeft and bottomRight
-        let topLeft = [rect.origin.x, rect.origin.y + rect.size.height]
-        let bottomRight = [rect.origin.x + rect.size.width, rect.origin.y]
+        let jsonDict = ["x": rect.origin.x, "width": rect.size.width, "y": rect.origin.y , "height": rect.size.height]
+        savedRectCoords.append(jsonDict)
+        
+        do {
+            // Step 3: Convert your dictionary to JSON Data
+            let jsonData = try JSONSerialization.data(withJSONObject: savedRectCoords, options: [])
 
-        // Create the dictionary
-        let jsonDict: [String: [CGFloat]] = [
-            "topLeft": topLeft,
-            "bottomRight": bottomRight
-        ]
+            // Step 4: Create a file URL
+            let fileURL = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("Coordinates.json")
+            
+            // Step 5: Write the data to the file
+            try jsonData.write(to: fileURL, options: [])
+            print("Coordinate was written to the file successfully!")
+        } catch {
+            print("Error: \(error)")
+        }
 
         // Convert the dictionary to JSON data
         if let jsonData = try? JSONSerialization.data(withJSONObject: jsonDict, options: .prettyPrinted),
            let jsonString = String(data: jsonData, encoding: .utf8) {
             print(jsonString)
         }
-        
-        
 
         if(self.cliFlags.count > 1 && self.cliFlags[1] == "--onerun"){
             exit(0)

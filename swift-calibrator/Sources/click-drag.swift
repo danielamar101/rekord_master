@@ -6,6 +6,8 @@ class DragAreaView: NSView {
     private var startPoint: NSPoint?
     private var dragRect: NSRect?
     
+    private var actualRect: NSRect?
+    
 
     // Array to store rectangles
     var rectangles: [NSRect] = []
@@ -26,27 +28,34 @@ class DragAreaView: NSView {
         
         // Convert the coordinates to the absolute screen coordinates
         var currentPoint = window?.convertPoint(toScreen: windowPoint) ?? NSPoint.zero
+        
+        
         // To make the coordinates match up with ocr screenreader
-        if let screen = window?.screen {
-            let screenHeight = screen.frame.size.height
-            currentPoint.y = screenHeight - currentPoint.y
-        }
+//        if let screen = window?.screen {
+//            let screenHeight = screen.frame.size.height
+//            currentPoint.y = screenHeight - currentPoint.y
+//        }
         
         
-        //print("Relative Point:" + NSStringFromPoint(windowPoint))
-        //print("Absolute Point:" + NSStringFromPoint(currentPoint))
+
         dragRect = NSRect(x: min(start.x, windowPoint.x),
                           y: min(start.y, windowPoint.y),
                           width: abs(windowPoint.x - start.x),
                           height: abs(windowPoint.y - start.y))
         
+        self.actualRect = NSRect(x: start.x,
+                          y: start.y,
+                          width: abs(currentPoint.x - start.x),
+                          height: abs(currentPoint.y - start.y))
         
+        print("Relative Rect:" + NSStringFromRect(dragRect ?? NSRect(x: 0, y: 0, width: 0, height: 0)))
+        print("Absolute Rect:" + NSStringFromRect(self.actualRect ?? NSRect(x: 0, y: 0, width: 0, height: 0)))
         needsDisplay = true
     }
 
     override func mouseUp(with event: NSEvent) {
         if let dragRect = dragRect {
-            delegate?.dragAreaDidFinishDragging(withRect: dragRect)
+            delegate?.dragAreaDidFinishDragging(withRect: self.actualRect ?? dragRect)
         }
         addRectangle(dragRect ?? NSRect(x: 0, y: 0, width: 0, height: 0))
         dragRect = nil
