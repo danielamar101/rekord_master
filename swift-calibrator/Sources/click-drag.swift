@@ -48,8 +48,8 @@ class DragAreaView: NSView {
                           width: abs(currentPoint.x - start.x),
                           height: abs(currentPoint.y - start.y))
         
-        print("Relative Rect:" + NSStringFromRect(dragRect ?? NSRect(x: 0, y: 0, width: 0, height: 0)))
-        print("Absolute Rect:" + NSStringFromRect(self.actualRect ?? NSRect(x: 0, y: 0, width: 0, height: 0)))
+        //print("Relative Rect:" + NSStringFromRect(dragRect ?? NSRect(x: 0, y: 0, width: 0, height: 0)))
+    //print("Absolute Rect:" + NSStringFromRect(self.actualRect ?? NSRect(x: 0, y: 0, width: 0, height: 0)))
         needsDisplay = true
     }
 

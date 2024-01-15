@@ -12,88 +12,105 @@ sleepTimeBetweenEvents = 3
 def convertToInt(x):
     return int(x)
 
+last_json = ''
+def watch_file_and_return_new_json():
+    global last_json
+    file_name = './Coordinates.json'
+    # Clear file
+    with open(file_name, 'w') as file:
+        pass
+    last_size = os.path.getsize(file_name)
+    while True:
+        current_size = os.path.getsize(file_name)
+        # print(f'current size: {current_size}, last size is: {last_size}')
+        if current_size != last_size:
+            with open(file_name, 'r') as file:
+                try:
+                    new_json = json.load(file)
+                    latest_coordinate = ''
+                    if(new_json != last_json):
+                        latest_coordinate = new_json[len(new_json)-1]
+
+                        last_json = new_json
+                        return latest_coordinate
+                    #return new_json
+                except json.JSONDecodeError:
+                    # In case the new content is not a valid JSON object
+                    pass
+        last_size = current_size
+        time.sleep(1)  # Wait for 1 second before checking the file again
+
+
 
 def calibrate():
 
     boxes = subprocess.Popen(['../../swift-calibrator/swift-calibrator'])
 
-    output = boxes.stdout.decode('utf-8')
 
-        # Parse the JSON output
-    try:
-        json_data = json.loads(output)
-    except json.JSONDecodeError:
-        print("Error decoding JSON from the output")
-        json_data = None
-
-    print("Hover over the top left of the title bounding box...")
-    time.sleep(sleepTimeBetweenEvents)
-    topLeftTitlePos = tuple(map(convertToInt,mouse.position))
-    print(f"Captured: {topLeftTitlePos}")
+    print("Hover over the title bounding box...")
+    title_bounding_box = watch_file_and_return_new_json()
+    print(f"Captured: {title_bounding_box}")
     os.system('say "Good."')
 
+    print("Hover over the percent speed bounding box...")
+    percent_speed_box = watch_file_and_return_new_json()
+    print(f"Captured: {percent_speed_box}")
+    os.system('say "Good."')
 
-    # print("Hover over the top left of the percent speed bounding box...")
-    # time.sleep(sleepTimeBetweenEvents)
-    # topLeftSpeedPos = tuple(map(convertToInt,mouse.position))
-    # print(f"Captured: {topLeftSpeedPos}")
-    # os.system('say "Good."')
+    print("Hover over the elapsed time bounding box...")
+    elapsed_time = watch_file_and_return_new_json()
+    print(f"Captured: {elapsed_time}")
+    os.system('say "Good."')
 
+    print("Hover over the original BPM bounding box...")
+    original_bpm = watch_file_and_return_new_json()
+    print(f"Captured: {original_bpm}")
+    os.system('say "Good."')
 
-    # print("Hover over the top left of the elapsed time bounding box...")
-    # time.sleep(sleepTimeBetweenEvents)
-    # topLeftElapsedTimePos = tuple(map(convertToInt,mouse.position))
-    # print(f"Captured: {topLeftElapsedTimePos}")
-    # os.system('say "Good."')
+    boxes.kill()
+    
+    deck_boxes =  {
+        "title_pos" : title_bounding_box,
+        "percent_speed_box" : percent_speed_box,
+        "elapsed_time_box" : elapsed_time,
+        "original_bpm_box" : original_bpm
+    }
 
-
-    # print("Hover over the top left of the original BPM bounding box...")
-    # time.sleep(sleepTimeBetweenEvents)
-    # topLeftBPMPos = tuple(map(convertToInt,mouse.position))
-    # print(f"Captured: {topLeftElapsedTimePos}")
-    # os.system('say "Good."')
-
-
-
-    # deckBoundingBoxes =  {
-    #     "titlePos" : {'topLeft': topLeftTitlePos, 'bottomRight': bottomRightTitlePos},
-    #     "percentSpeedPos" : { 'topLeft': topLeftSpeedPos, 'bottomRight': bottomRightSpeedPos},
-    #     "elapsedTimePos" : {'topLeft': topLeftElapsedTimePos, 'bottomRight': bottomRightElapsedTimePos},
-    #     "originalBPM" : {'topLeft': topLeftBPMPos, 'bottomRight': bottomRightBPMPos}
-    # }
-
-    # return deckBoundingBoxes
+    return deck_boxes
 
 
 def main():
-        print("Hello. Welcome to the calibrator. You will have 3 seconds between each mouse position")
+        print("Hello. Welcome to the calibrator. ")
         print("Ready?")
-        # os.system('say "Beginning Calibration."')
+        os.system('say "Beginning Calibration."')
 
         print("First, we will calibrate the left deck...")
 
         leftDeck = calibrate()
 
+        print(leftDeck)
+
+        print("Next, we will calibrate the right deck...")
+
+        rightDeck = calibrate()
+
         # print(leftDeck)
+        print(rightDeck)
 
-        # print("Next, we will calibrate the right deck...")
-
-        # rightDeck = calibrate()
-
-        # print(leftDeck)
-        # print(rightDeck)
-
-        # return json.dumps({
-        #      'left_deck': leftDeck,
-        #      'right_deck': rightDeck
-        # })
+        return {
+             'left_deck': leftDeck,
+             'right_deck': rightDeck
+        }
 
 
 if __name__ == "__main__":
      
-    new_mouse_positions = main()
+    new_bounding_boxes = main()
+    # boxes = subprocess.Popen(['../../swift-calibrator/swift-calibrator'])
+
+
     shouldISave = input("Should we save these results? Y/n:")
     if shouldISave == 'Y':
         file_out = open('./DECK_MOUSE_POS.json', 'w')
-        file_out.write(new_mouse_positions)
+        file_out.write(json.dumps(new_bounding_boxes))
         file_out.close()
