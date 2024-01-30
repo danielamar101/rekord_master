@@ -18,11 +18,11 @@ def loadAndFireCoordinates():
 
     rawCoordinates = []
 
-    for deck,attributes in decks.items():
-        for attribute,boundingVertices in attributes.items():
-            #print(f"{deck}: {attribute} {boundingVertices} ")
-            for topOrBottom, coordinates in boundingVertices.items():
-                rawCoordinates.append(coordinates)
+    for deck,box in decks.items():
+        for attribute,bounding_box in box.items():
+            rawCoordinates.append(bounding_box)
+
+    # print(rawCoordinates)
 
     toReturn = jsonToScreenCaptureFormat(rawCoordinates)
     return toReturn
@@ -30,14 +30,14 @@ def loadAndFireCoordinates():
 def jsonToScreenCaptureFormat(coordinates):
     toReturn = []
 
-    for i in range(1, len(coordinates),2):
+    for item in coordinates:
         
-        topLeftX, topLeftY = coordinates[i-1]
-        bottomRightX, bottomRightY = coordinates[i] 
-        width = bottomRightX - topLeftX
-        height = bottomRightY - topLeftY
+        x = str(int(item['x']))
+        y = str(int(item['y']))
+        width = str(int(item['width']))
+        height = str(int(item['height']))
 
-        toReturn.append(f'-R{topLeftX},{topLeftY},{width},{height}')
+        toReturn.append(f'-R{x},{y},{width},{height}')
     
     return toReturn
 
@@ -128,33 +128,34 @@ def getRightDeck():
 
 if __name__ == "__main__":
     pos_path = os.path.join('./DECK_MOUSE_POS.json')
-
-    def calibrateScreenCoords():
-        try:   
-            print(os.environ['CALIBRATE'])
-            if (os.environ['CALIBRATE'] == 'true'):
-                from calibrate_full import main as calibrate
-                new_mouse_positions = calibrate()
-                shouldISave = input("Should we save these results? Y/n:")
-                if shouldISave == 'Y':
-                    file_out = open('./DECK_MOUSE_POS.json', 'w')
-                    file_out.write(new_mouse_positions)
-                    file_out.close()
-            else:
-                print('Correct env var was not set. Not calibrating.')
+    print(loadAndFireCoordinates())
+    # def calibrateScreenCoords():
+    #     try:   
+    #         print(os.environ['CALIBRATE'])
+    #         if (os.environ['CALIBRATE'] == 'true'):
+    #             from calibrate_full import main as calibrate
+    #             new_mouse_positions = calibrate()
+    #             shouldISave = input("Should we save these results? Y/n:")
+    #             if shouldISave == 'Y':
+    #                 file_out = open('./DECK_MOUSE_POS.json', 'w')
+    #                 file_out.write(new_mouse_positions)
+    #                 file_out.close()
+    #         else:
+    #             print('Correct env var was not set. Not calibrating.')
             
-        except KeyError as e:
-            print("CALIBRATIONS env var is not set. will not calibrate.")
-            pass
+    #     except KeyError as e:
+    #         print("CALIBRATIONS env var is not set. will not calibrate.")
+    #         pass
 
-    calibrateScreenCoords()
+    # calibrateScreenCoords()
 
-    time.sleep(3)
-    print(getLeftDeck())
-    print(getRightDeck())
+    # time.sleep(3)
+    # print(getLeftDeck())
+    # print(getRightDeck())
 else: 
     from ocr.calibrate_full import main as calibrate
     pos_path = os.path.join(os.getcwd(),'ocr','DECK_MOUSE_POS.json')
+    # calibrate()
 
 
 
