@@ -7,7 +7,7 @@ import traceback
 # import pytesseract
 #from PIL import Image
 
-from helpers.data_conversions import elapsedStringTimeToIntegerEpoch, relativeStringPercentToDecimal
+from helpers.data_conversions import elapsedStringTimeToSeconds, relativeStringPercentToDecimal
 from app.process_handlers import manage_video_processes
 from app.listeners import checkListener
 from ocr.get_both_deck_info import getLeftDeck, getRightDeck
@@ -31,8 +31,8 @@ def main():
 
         # Song Name, Elapsed Time, percent speed, starting bpm
         deck_info = {'song_name': deck_list[0], 
-                     'elapsed_time': elapsedStringTimeToIntegerEpoch(deck_list[2]), 
-                     'percent_speed': relativeStringPercentToDecimal(deck_list[1]), 
+                     'elapsed_time': elapsedStringTimeToSeconds(deck_list[2]), 
+                     'percent_speed': relativeStringPercentToDecimal(deck_list[1],deck_list[3]), 
                      'starting_bpm': deck_list[3]} 
       
         print("")
@@ -40,7 +40,7 @@ def main():
         print("")
 
         #2 Find song in file directory  
-        videoList = os.listdir("./videos")
+        videoList = os.listdir(os.path.join(os.getcwd(),"videos"))
             # Obtain song name in the videos directory if its an mp4
         filtered_video_list = [video[0:len(video)-4] for video in videoList if video[(len(video)-3):] == 'mp4']
         #print(f'List of videos in videos dir: {filtered_video_list}') 

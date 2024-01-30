@@ -11,7 +11,13 @@ class DragAreaView: NSView {
 
     // Array to store rectangles
     var rectangles: [NSRect] = []
-
+    
+    public func addRectangleArray(_ boundBoxArray: [NSRect]){
+        for rectangle in boundBoxArray{
+            addRectangle(rectangle)
+        }
+    }
+    
     // Function to add a new rectangle
     func addRectangle(_ rectangle: NSRect) {
         rectangles.append(rectangle)
@@ -80,4 +86,6 @@ class DragAreaView: NSView {
             
         }
     }
+
+
 }

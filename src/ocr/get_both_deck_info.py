@@ -127,7 +127,7 @@ def getRightDeck():
     return [deck2Name,deck2PercentSpeed, deck2ElapsedTime, deck2OriginalBPM]
 
 if __name__ == "__main__":
-    pos_path = os.path.join('./DECK_MOUSE_POS1.json')
+    pos_path = os.path.join('./DECK_MOUSE_POS.json')
     print(loadAndFireCoordinates())
     # def calibrateScreenCoords():
     #     try:   

@@ -43,6 +43,13 @@ class MainScript: NSObject, DragAreaDelegate, NSWindowDelegate {
         
     }
     
+    struct BoundingBox : Codable {
+        let width: Double
+        let height: Double
+        let x: Double
+        let y: Double
+    }
+    
     func dragAreaDidFinishDragging(withRect rect: NSRect) {
         //print("Dragged Area: \(rect)")
         
@@ -77,6 +84,46 @@ class MainScript: NSObject, DragAreaDelegate, NSWindowDelegate {
         
     }
     
+    func readAndDecodeJSONFromFileAtPath<T: Codable>(filePath: String, modelType: T.Type) -> T? {
+        let fileURL = URL(fileURLWithPath: filePath)
+
+        do {
+            let data = try Data(contentsOf: fileURL)
+            let decoder = JSONDecoder()
+            let decodedData = try decoder.decode(T.self, from: data)
+            return decodedData
+        } catch {
+            print("Error reading or decoding JSON: \(error.localizedDescription)")
+            return nil
+        }
+    }
+    
+    func extractBoxes(filename: String) -> [NSRect]{
+        print("in extract Boxes")
+        if let fileURL = Bundle.main.url(forResource: filename, withExtension: "json") {
+            do {
+                let data = try Data(contentsOf: fileURL)
+                    print("In here")
+                if let jsonObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    // Now `jsonObject` is a dictionary with your JSON data
+                    print(jsonObject)
+                }
+            } catch {
+                print("Error reading or serializing JSON: \(error.localizedDescription)")
+            }
+        }
+        
+        return [NSRect]()
+    }
+    
+    func boxFilePath() -> String{
+        if(self.cliFlags.count > 1 && self.cliFlags[1] == "--pos-path"){
+            return self.cliFlags[2]
+        }else{
+            return ""
+        }
+    }
+    
 
     func run() {
         let screenFrame = NSScreen.main?.visibleFrame ?? NSRect.zero
@@ -84,6 +131,28 @@ class MainScript: NSObject, DragAreaDelegate, NSWindowDelegate {
         let app = NSApplication.shared
         let viewController = NSViewController()
         let dragAreaView = DragAreaView()
+        
+        let boxPath: String = boxFilePath()
+        var boxArrayAsNSRect: [NSRect] = [NSRect]()
+        
+        if boxPath != "" {
+            // var importedRects: [NSRect]? = extractBoxes(filename: boxFilePath())
+            print(boxPath)
+            if let boxArray: [BoundingBox] = readAndDecodeJSONFromFileAtPath(filePath: boxPath, modelType: [BoundingBox].self) {
+                
+                for box in boxArray{
+                    boxArrayAsNSRect.append(NSMakeRect(box.x, box.y, box.width, box.height))
+                }
+                // Successfully decoded JSON into `myModelInstance`
+                print(boxArrayAsNSRect)
+                dragAreaView.addRectangleArray(boxArrayAsNSRect)
+                
+            } else {
+                // Failed to decode JSON
+                print("Failed to read or decode JSON from the specified path")
+            }
+        }
+
         dragAreaView.frame = screenFrame
         dragAreaView.delegate = self
         viewController.view = dragAreaView

@@ -29,20 +29,29 @@ def relativeStringPercentToDecimal(percentSpeed, originalBPM):
         print("Error getting the relative percent speed.")
 
 
-# Given a string with an elapsed time in MM:SS format, convert to an integer
-def elapsedStringTimeToIntegerEpoch(time_str):
-    # Split the time string into minutes and seconds
-
+def elapsedStringTimeToSeconds(time_str):
+    # Split the time string into minutes, seconds, and (optionally) milliseconds
+    
     try:
-        minutes, seconds = map(int, time_str.split(':'))
+
+        parts = time_str.split(":")
     
-        # Convert to total seconds
-        total_seconds = minutes * 60 + seconds
-    
+        # Convert minutes and seconds to integers
+        minutes = int(parts[0])
+        seconds = int(parts[1][0:2])
+
+        
+        # Calculate total seconds
+        total_seconds = (minutes * 60) + seconds
+        
         return total_seconds
     except Exception as e:
+        print(e)
+        # raise ValueError("Time string must be at least in MM:SS format")
         print("Error getting the time. sending 00:00 for now..")
         return "00:00"
+
+    
 
 
 def current_milli_time():
