@@ -99,7 +99,7 @@ class MainScript: NSObject, DragAreaDelegate, NSWindowDelegate {
     }
     
     func extractBoxes(filename: String) -> [NSRect]{
-        print("in extract Boxes")
+    
         if let fileURL = Bundle.main.url(forResource: filename, withExtension: "json") {
             do {
                 let data = try Data(contentsOf: fileURL)
@@ -116,6 +116,7 @@ class MainScript: NSObject, DragAreaDelegate, NSWindowDelegate {
         return [NSRect]()
     }
     
+    // finds the path after the --pos-path var
     func boxFilePath() -> String{
         if(self.cliFlags.count > 1 && self.cliFlags[1] == "--pos-path"){
             return self.cliFlags[2]
@@ -132,26 +133,6 @@ class MainScript: NSObject, DragAreaDelegate, NSWindowDelegate {
         let viewController = NSViewController()
         let dragAreaView = DragAreaView()
         
-        let boxPath: String = boxFilePath()
-        var boxArrayAsNSRect: [NSRect] = [NSRect]()
-        
-        if boxPath != "" {
-            // var importedRects: [NSRect]? = extractBoxes(filename: boxFilePath())
-            print(boxPath)
-            if let boxArray: [BoundingBox] = readAndDecodeJSONFromFileAtPath(filePath: boxPath, modelType: [BoundingBox].self) {
-                
-                for box in boxArray{
-                    boxArrayAsNSRect.append(NSMakeRect(box.x, box.y, box.width, box.height))
-                }
-                // Successfully decoded JSON into `myModelInstance`
-                print(boxArrayAsNSRect)
-                dragAreaView.addRectangleArray(boxArrayAsNSRect)
-                
-            } else {
-                // Failed to decode JSON
-                print("Failed to read or decode JSON from the specified path")
-            }
-        }
 
         dragAreaView.frame = screenFrame
         dragAreaView.delegate = self
@@ -173,6 +154,30 @@ class MainScript: NSObject, DragAreaDelegate, NSWindowDelegate {
         
         app.setActivationPolicy(.regular)
         app.activate(ignoringOtherApps: true)
+        
+        let boxPath: String = boxFilePath()
+        var boxArrayAsNSRect: [NSRect] = [NSRect]()
+        
+        // Subroutine to load boxes in from coordinates
+        if boxPath != "" {
+
+            print(boxPath)
+            if let boxArray: [BoundingBox] = readAndDecodeJSONFromFileAtPath(filePath: boxPath, modelType: [BoundingBox].self) {
+                
+                for box in boxArray{
+                    boxArrayAsNSRect.append(NSMakeRect(box.x, box.y, box.width, box.height))
+                }
+                
+                print(boxArrayAsNSRect)
+                dragAreaView.addRectangleArray(boxArrayAsNSRect)
+                
+            } else {
+                // Failed to decode JSON
+                print("Failed to read or decode JSON from the specified path")
+            }
+        }
+
+        
         app.run()
         
     }
